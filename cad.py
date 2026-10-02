@@ -14,7 +14,7 @@ import os
 
 CODE_ROOT = Path(__file__).resolve().parent
 ROOT = Path(os.environ.get("HOUSE_DATA_DIR", str(CODE_ROOT / "private"))).resolve()
-CONFIG = json.loads((ROOT / "data/project.json").read_text(encoding="utf-8"))
+CONFIG = {}
 PALETTE = {
     "render": [0.83, 0.82, 0.75, 1], "interior": [0.92, 0.90, 0.84, 1],
     "roof": [0.36, 0.22, 0.15, 1], "frame": [0.92, 0.92, 0.86, 1],
@@ -99,7 +99,11 @@ def load_scheme(scheme):
                    "unsupported": {k: v for k, v in counts.items() if k != "3DFACE"}}
 
 
-def build_project():
+def build_project(data_root=None):
+    global ROOT, CONFIG
+    if data_root is not None:
+        ROOT = Path(data_root).resolve()
+    CONFIG = json.loads((ROOT / 'data/project.json').read_text(encoding='utf-8'))
     loaded = {s: load_scheme(s) for s in ("existing", "proposed")}
     models = {}
     for scheme, (faces, report) in loaded.items():

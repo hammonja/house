@@ -1,12 +1,12 @@
 [Unit]
-Description=Rances Lane House Design
+Description=House Design
 After=network.target
 
 [Service]
 # TEMPLATE ONLY: replace this user and both paths with the real installation.
 User=pi
 WorkingDirectory=/opt/house-design
-ExecStart=/opt/house-design/.venv/bin/waitress-serve --listen=127.0.0.1:5055 app:app
+ExecStart=/usr/bin/python3 /opt/house-design/app.py
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=true

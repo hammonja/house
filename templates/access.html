@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ 'Set up' if setup else 'Sign in' }} · House Design</title>
+<link rel="stylesheet" href="/static/access.css"></head>
+<body><main class="access-card"><span class="eyebrow">HOUSE DESIGN STUDIO</span>
+<h1>{{ 'Make yourself at home.' if setup else 'Welcome home.' }}</h1>
+<p>{{ 'Set a password to keep your drawings, photographs and models private.' if setup else 'Sign in to explore your house and extension.' }}</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf_token() }}">
+{% if setup %}<label>Setup code<input name="setup_code" autocomplete="off" required maxlength="100" spellcheck="false"></label>
+<details><summary>Where do I find my setup code?</summary><p>In PiDash, open Files and your house app’s private folder. Open <code>setup-code.txt</code> and paste its contents here. This code works once.</p></details>{% endif %}
+<label>{{ 'Choose a password' if setup else 'Password' }}<input type="password" name="password" autocomplete="{{ 'new-password' if setup else 'current-password' }}" required {% if setup %}minlength="12"{% endif %} maxlength="256"></label>
+{% if setup %}<label>Confirm password<input type="password" name="confirmation" autocomplete="new-password" required minlength="12" maxlength="256"></label>{% endif %}
+<button type="submit">{{ 'Set password & open the studio' if setup else 'Open the studio' }}</button></form>
+<small>Your house files are stored privately on your server.</small></main></body></html>
