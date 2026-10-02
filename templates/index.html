@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f3ed"><title>{{ project_title }} · House design</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23264036'/%3E%3Cpath d='M14 30L32 14L50 30V50H37V35H27V50H14Z' fill='none' stroke='%23edeadf' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css">
+  <script type="importmap">{"imports":{"three":"/static/vendor/three.module.js"}}</script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="House design home"><span class="brand-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 15 16 5l11 10v13h-8V18h-6v10H5Z"/></svg></span><span><strong>{{ project_title }}</strong><small>HOUSE DESIGN STUDIO</small></span></a>
+  <div class="project-state"><span class="live-dot"></span> Design study <span class="divider">/</span> Version 03</div>
+  <div class="header-actions"><button class="button secondary" id="references-button"><span aria-hidden="true">▧</span> References <span class="count">4 + 3</span></button><button class="button primary" id="export-button"><span aria-hidden="true">↓</span> Export model</button></div>
+</header>
+<div class="workspace">
+<aside class="sidebar">
+  <div class="sidebar-intro"><span class="eyebrow">YOUR PROJECT</span><h1>A little more<br>room to imagine.</h1><p>Explore the house today.<br>See what could come next.</p></div>
+  <section class="control-section"><div class="section-title"><h2>Design option</h2><span class="number">01</span></div>
+    <div class="scenario-buttons" role="group" aria-label="Design option"><button data-scheme="existing" class="selected" aria-pressed="true"><span class="option-icon">⌂</span><span><strong>Existing house</strong><small>As drawn today</small></span><span class="radio-dot"></span></button><button data-scheme="proposed" aria-pressed="false"><span class="option-icon">⌂</span><span><strong>Proposed extension</strong><small>The planner’s proposal</small></span><span class="radio-dot"></span></button></div>
+    <button id="compare-button" class="compare-button" aria-pressed="false"><span aria-hidden="true">◫</span> Compare side by side</button>
+  </section>
+  <section class="control-section plot-section"><div class="section-title"><h2>Your plot</h2><span class="estimate-badge">ESTIMATE</span></div>
+    <div class="plot-summary"><strong id="plot-dimensions">—</strong><span id="plot-area">Loading plot dimensions</span></div>
+    <div class="segmented" role="group" aria-label="View extent"><button data-scope="house" class="selected" aria-pressed="true">House</button><button data-scope="drive" aria-pressed="false">Driveway</button><button data-scope="plot" aria-pressed="false">Whole plot</button></div>
+    <label class="toggle-row"><span>Show plot boundary</span><input id="plot-toggle" type="checkbox" checked><span class="switch"></span></label>
+    <button class="plot-edit" id="edit-plot">Adjust dimensions & house position ↗</button>
+    <small class="plot-caption">Extends to the playing-field hedge. Driveway layout follows your photographs; edges remain approximate.</small>
+  </section>
+  <section class="control-section"><div class="section-title"><h2>Explore the model</h2><span class="number">02</span></div>
+    <label class="field-label">Show floors</label><div class="segmented" role="group" aria-label="Show floors"><button data-floor="all" class="selected" aria-pressed="true">All</button><button data-floor="ground" aria-pressed="false">Ground</button><button data-floor="first" aria-pressed="false">First</button></div>
+    <label class="toggle-row"><span>Roof <small>Original CAD roof</small></span><input type="checkbox" id="roof-toggle" checked><span class="switch"></span></label>
+    <label class="toggle-row"><span>Separate floors</span><input type="checkbox" id="explode-toggle"><span class="switch"></span></label>
+    <label class="toggle-row"><span>Highlight changed faces</span><input type="checkbox" id="changes-toggle"><span class="switch"></span></label>
+  </section>
+  <section class="control-section"><div class="section-title"><h2>Look & feel</h2><span class="number">03</span></div>
+    <div class="material-options" role="group" aria-label="Model appearance"><button data-style="materials" class="selected" aria-pressed="true"><span class="material-swatch textured"></span>Materials</button><button data-style="clay" aria-pressed="false"><span class="material-swatch clay"></span>White model</button></div>
+    <label class="toggle-row"><span>Drawing edges</span><input type="checkbox" id="edges-toggle" checked><span class="switch"></span></label>
+    <div class="palette"><span style="--swatch:#864d37" title="Red brick"></span><span style="--swatch:#dedccf" title="Pale render"></span><span style="--swatch:#70533c" title="Clay roof tiles"></span><span style="--swatch:#839480" title="Sage doors"></span><small>Inspired by your photographs</small></div>
+  </section>
+  <details class="model-settings"><summary>Model settings <span>+</span></summary><label for="floor-height">Floor-to-floor height <output id="floor-height-value">2.70 m</output></label><input id="floor-height" type="range" min="2.4" max="3.4" step="0.05" value="2.7"><p>Provisional level. Changes update the viewer and GLB export.</p><label class="toggle-row"><span>Floor & site guides</span><input id="guides-toggle" type="checkbox" checked><span class="switch"></span></label></details>
+  <button class="source-note" id="source-note"><span class="note-icon">i</span><span><strong>Built from your drawings</strong><small>View source details & assumptions ↗</small></span></button>
+</aside>
+<main class="main">
+  <div class="view-heading"><div><span class="eyebrow" id="view-eyebrow">EXISTING HOUSE</span><h2 id="view-title">A familiar place. A new perspective.</h2></div><span class="model-badge"><span></span> 3D model</span></div>
+  <div class="viewer-shell" id="viewer-shell">
+    <div id="viewer" role="img" aria-label="Interactive 3D house model. Drag to orbit, scroll to zoom, right drag to pan."></div>
+    <div id="loading" class="loading"><span class="spinner"></span><strong>Opening your house…</strong><span>Reading the planner’s geometry</span></div>
+    <div id="error" class="error" hidden><strong>The 3D viewer couldn’t start.</strong><p id="error-message"></p><button onclick="location.reload()">Try again</button><a href="/api/report" target="_blank">View import report</a></div>
+    <div class="viewport-top"><span class="view-chip" id="view-chip">Existing · Whole house</span><button class="icon-button" id="reset-view" title="Reset camera" aria-label="Reset camera">↺</button></div>
+    <div class="compare-labels" id="compare-labels" hidden><span>01 <strong>Existing house</strong></span><span>02 <strong>Proposed extension</strong></span></div>
+    <div class="compare-line" id="compare-line" hidden></div>
+    <div class="changed-legend" id="changed-legend" hidden><span></span> Changed CAD faces</div>
+    <div class="selection-label" id="selection-label" hidden></div>
+    <div class="plot-view-note" id="plot-view-note" hidden>Indicative boundary · flat ground · map estimates</div>
+    <div class="view-toolbar" role="group" aria-label="Camera viewpoint"><button data-view="perspective" class="selected" aria-pressed="true">3D</button><button data-view="front" aria-pressed="false">Front</button><button data-view="rear" aria-pressed="false">Rear</button><button data-view="top" aria-pressed="false">Plan</button><span></span><button id="snapshot" title="Download the current view as a PNG" aria-label="Save snapshot">▣</button></div>
+    <div class="navigation-hint"><span>↔</span> Drag to orbit <i>·</i> Scroll to zoom <i>·</i> Right-drag to pan</div>
+    <span class="orientation-label" id="orientation-label">FRONT / STREET</span>
+  </div>
+  <div class="below-view"><div class="model-facts"><div><span id="face-count">—</span><small>source CAD faces</small></div><div><span id="model-size">—</span><small>model footprint bounds</small></div><div><span>1 : 1</span><small>geometry in metres</small></div></div><button class="review-note" id="review-note"><span>!</span><span><strong>Roof detail needs review</strong><small id="roof-note">The photo’s front gable is absent from the CAD roof. View notes ↗</small></span></button></div>
+  <div class="workspace-footer"><span>HOUSE DESIGN <span class="footer-line"></span> A space to explore your next chapter.</span><span>Study model · Verify dimensions before building</span></div>
+</main>
+</div>
+<dialog id="references-dialog"><div class="dialog-heading"><div><span class="eyebrow">PROJECT LIBRARY</span><h2>Your references</h2></div><button class="close-dialog" aria-label="Close references">×</button></div><div class="dialog-body"><div class="reference-photos"><figure><a href="/reference/front.png" target="_blank"><img src="/reference/front.png" alt="Front of {{ project_title }} with pale render, red brick, tiled gable and sage green doors"></a><figcaption><strong>01 / Front elevation</strong><span>Materials, colour & character</span></figcaption></figure><figure><a href="/reference/rear.png" target="_blank"><img src="/reference/rear.png" alt="Rear of the existing house with conservatory and garden"></a><figcaption><strong>02 / Garden elevation</strong><span>Rear facade & conservatory</span></figcaption></figure><figure class="overhead-reference"><a href="/reference/drive-overhead.png" target="_blank"><img src="/reference/drive-overhead.png" alt="Owner-supplied overhead view showing the broad front drive, narrowing street entrance and green corners"></a><figcaption><strong>03 / Driveway from above</strong><span>Layout, planting &amp; access · approximate tracing</span></figcaption></figure></div><p class="photo-note">The overhead image guides the driveway outline; the front photograph guides tan herringbone paving and timber boundaries. The tree hides part of the edge, so the entrance, planting and heights remain approximate. Both house options show the same existing driveway.</p><h3>Source drawings</h3><div id="source-list" class="source-list"></div><h3>What the model tells us</h3><ol id="model-notes" class="model-notes"></ol><a href="/api/report" target="_blank" class="text-link">Open the full import report ↗</a></div></dialog>
+<dialog id="export-dialog"><div class="dialog-heading"><div><span class="eyebrow">TAKE YOUR MODEL WITH YOU</span><h2>Export 3D model</h2></div><button class="close-dialog" aria-label="Close export">×</button></div><div class="dialog-body"><p>Download a GLB for Blender and other 3D tools. Includes the imported house geometry, CAD layers and basic materials.</p><p>Exports use the current floor-to-floor height of <strong id="export-height">2.70 m</strong>. Display filters, site guides and decorative textures are excluded.</p><div class="export-links"><a id="export-existing" class="button primary" href="/models/existing.glb">↓ Existing house</a><a id="export-proposed" class="button secondary" href="/models/proposed.glb">↓ Proposed extension</a></div><p class="export-caution">The source roof and provisional floor levels are retained. Unresolved details are recorded in the file’s metadata.</p></div></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+<dialog id="plot-dialog"><div class="dialog-heading"><div><span class="eyebrow">THE SPACE AROUND YOUR HOUSE</span><h2>Plot & house position</h2></div><button class="close-dialog" aria-label="Close plot settings">×</button></div>
+  <div class="dialog-body"><p class="plot-explanation">An initial rectangular outline from the Google Maps ruler. You confirmed that the garden reaches the playing-field hedge. These dimensions and the house placement need checking on the ground.</p>
+    <a class="text-link" href="{{ plot_source_url }}" target="_blank" rel="noopener">Open your Google Maps reference ↗</a>
+    <form id="plot-form"><div class="plot-inputs">
+      <label for="plot-depth">Plot depth <small>Street edge to field hedge</small><span><input id="plot-depth" name="depth" type="number" min="25" max="200" step="0.1" required> m</span></label>
+      <label for="plot-width">Plot width <small>Frontage; rear width assumed equal</small><span><input id="plot-width" name="width" type="number" min="10" max="40" step="0.1" required> m</span></label>
+      <label for="plot-setback">Front setback <small>Street edge to frontmost CAD bay</small><span><input id="plot-setback" name="setback" type="number" min="0" max="100" step="0.1" required> m</span></label>
+      <label for="plot-left-gap">Left-side gap <small>Boundary to existing left wall</small><span><input id="plot-left-gap" name="leftGap" type="number" min="0" max="20" step="0.1" required> m</span></label>
+    </div><p class="plot-explanation">Left and right are viewed from the street. Initial house placement is approximate until checked on the ground.</p>
+    <p id="plot-form-error" role="alert" hidden></p><div class="export-links"><button type="submit" class="button primary">Apply dimensions</button><button type="button" id="reset-plot" class="button secondary">Restore map estimate</button></div><p id="plot-save-status" class="plot-caption" role="status">Changes are saved in this browser only.</p></form>
+    <details class="plot-evidence"><summary>Measurement sources & limitations</summary><ul id="plot-source-notes"></ul></details>
+  </div>
+</dialog>
+<script type="module" src="/static/viewer.js"></script>
+</body></html>
