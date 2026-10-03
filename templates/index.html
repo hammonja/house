@@ -10,7 +10,7 @@
 <body>
 <header class="topbar">
   <a class="brand" href="/" aria-label="House design home"><span class="brand-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 15 16 5l11 10v13h-8V18h-6v10H5Z"/></svg></span><span><strong>{{ project_title }}</strong><small>HOUSE DESIGN STUDIO</small></span></a>
-  <div class="project-state"><span class="live-dot"></span> Design study <span class="divider">/</span> Version 0.4.0</div>
+  <div class="project-state"><span class="live-dot"></span> Design study <span class="divider">/</span> Version 0.4.1</div>
   <div class="header-actions"><a class="button secondary" href="/photos">Photo surveys</a><button class="button secondary" id="references-button"><span aria-hidden="true">▧</span> References <span class="count">4 + 3</span></button><button class="button primary" id="export-button"><span aria-hidden="true">↓</span> Export model</button><form method="post" action="/logout"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button class="button secondary">Sign out</button></form></div>
 </header>
 <div class="workspace">

@@ -18,7 +18,7 @@ Place the private data archive at `house-private-seed.zip` beside the app direct
 
 The first startup creates `private/setup-code.txt`. Open that file through your authenticated PiDash Files page, then enter its one-time code and choose a password at `/setup`. The setup code is required to create the password and is removed afterward. No default password exists. Password hashes and persistent session secrets remain in `private/auth.json`, outside Git. Keep a private backup of this directory. Every model, report, reference image and drawing requires sign-in. Password forms use CSRF checks and bounded attempts; private responses are not cached.
 
-Pull updates through PiDash’s Git page, then restart the house service and check `/health` for version `0.4.0`. Enable Start on boot after a successful startup. Do not change the tunnel route when updating the code.
+Pull updates through PiDash’s Git page, then restart the house service and check `/health` for version `0.4.1`. Enable Start on boot after a successful startup. Do not change the tunnel route when updating the code.
 
 ## Current baseline
 
@@ -26,7 +26,7 @@ Version 0.3 imports DXF 3DFACEs, aligns floors, displays existing/proposed compa
 
 The original source contained private house-specific constants; they now come from private project configuration (`house_bounds`, `floor_plates`, `source_files`, origin and floor registration). Private drawings and images are intentionally absent from this repository. Version 0.3.1 adds protected first-run setup and recoverable missing-data handling.
 
-## Photo surveys (0.4.0)
+## Photo surveys (0.4.1)
 
 Open **Photo surveys** from the viewer. Create a survey, label the part of the property, then use **Take photo** or select multiple files with **Upload photos**. The phone capture control requests the rear camera and falls back to the browser's file picker. Use overlapping daylight views with measured dimensions in the notes. JPEG, PNG and WebP are accepted, up to 20 MB each and 120 photos per survey; HEIC must be exported as JPEG. Images are decoded, oriented, resized to a maximum 2400 pixels and re-encoded without EXIF/GPS metadata. Identical normalized images in a survey are skipped.
 

@@ -1,4 +1,4 @@
-const CACHE = 'house-public-shell-v040';
+const CACHE = 'house-public-shell-v041';
 const PUBLIC = ['/static/offline.html','/static/photos.css','/static/photos.js','/static/icon-192.png','/static/icon-512.png','/manifest.webmanifest'];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(c => c.addAll(PUBLIC))); self.skipWaiting(); });
 self.addEventListener('activate', event => {

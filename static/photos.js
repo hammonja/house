@@ -22,7 +22,7 @@ document.getElementById('photo-app').innerHTML = `
 </section><section class="card"><div class="step">03 / REVIEW & KEEP</div><h2>Model revisions</h2><p id="active-status" class="help">Your drawing-based model is the starting point.</p><div class="row"><button id="undo" disabled>Undo last applied revision</button><a class="button" href="/">Open current model ↗</a></div><div id="revisions"></div><div id="preview" hidden></div></section>
 <p class="bottom-note">Study model · Photo-derived dimensions are estimates, not a measured survey. No photorealistic textures are generated. GLB downloads currently contain the original CAD geometry; use a viewer snapshot to share photo additions.</p></div></div></main>`;
 
-let status = null, survey = '', csrf = '', busy = false, photos = [], preview = null, installPrompt;
+let status = null, survey = '', csrf = '', busy = false, photos = [], preview = null, installPrompt, gallerySignature = '';
 function message(text, error = false) { $('message').textContent = text; $('message').classList.toggle('error', error); }
 function element(tag, text, className) { const node = document.createElement(tag); if (text != null) node.textContent = text; if (className) node.className = className; return node; }
 async function api(path, options = {}) {
@@ -65,6 +65,9 @@ async function refresh() {
 }
 async function loadSurvey() {
   photos = survey ? (await api(`/api/surveys/${survey}`)).photos : [];
+  const signature = survey + JSON.stringify(photos);
+  if (signature === gallerySignature) { controls(); return; }
+  gallerySignature = signature;
   $('photo-count').textContent = `${photos.length} survey photo${photos.length === 1 ? '' : 's'}`;
   $('gallery').replaceChildren(); $('gallery-empty').hidden = photos.length > 0;
   for (const photo of photos) {

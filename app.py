@@ -68,7 +68,7 @@ def create_app(config=None, project_loader=None):
 
     @app.get('/health')
     def health():
-        return jsonify(status='ok', app='house-design', version='0.4.0')
+        return jsonify(status='ok', app='house-design', version='0.4.1')
 
     @app.get('/photos')
     def photo_page():
