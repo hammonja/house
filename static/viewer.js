@@ -2,12 +2,14 @@ import * as THREE from 'three';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { HOUSE, configureHouse, STORAGE_KEY, validatePlot, plotBounds, readSavedPlot } from './plot.mjs';
 import { createDriveway } from './driveway.js';
+import { createPhotoFeatures, updatePhotoFeatures } from './photo-scene.js';
 
 const $ = (id) => document.getElementById(id);
 const state = { scheme: 'existing', compare: false, floor: 'all', roof: true, explode: false,
   changes: false, style: 'materials', edges: true, height: 2.7, guides: true, view: 'perspective', scope:'house', plotVisible:true };
 let project, renderer, scene, camera, controls, roots, guideRoot, width, height;
 let plot, plotRoot, boundaryRoot;
+let photoRoot;
 const metrics = {};
 const meshes = [], edgeLines = [], plates = [], modelMaterials = [], selected = new THREE.Vector2();
 let scheduled = false, toastTimer;
@@ -238,6 +240,7 @@ function resize() {
 }
 function showScheme(scheme) {
   roots.existing.visible=scheme==='existing';roots.proposed.visible=scheme==='proposed';
+  if(photoRoot)photoRoot.visible=scheme==='existing';
   for(const plate of plates) {
     plate.visible=state.guides&&plate.userData.scheme===scheme&&(state.floor==='all'||state.floor===plate.userData.floor);
     plate.position.y=plate.userData.floor==='first'?state.height+(state.explode?3:0):0;
@@ -288,6 +291,7 @@ function setView(view) {
 
 function update() {
   if(!roots)return;
+  if(photoRoot)updatePhotoFeatures(photoRoot,state);
   for(const root of Object.values(roots))root.userData.floors.first.position.y=state.height+(state.explode?3:0);
   for(const mesh of meshes) {
     const d=mesh.userData,roof=d.layer==='Roof'||d.layer==='Facia';
@@ -406,4 +410,16 @@ try {
     metrics[scheme]={width:maxX-minX,depth:maxZ-minZ};
   }
   populateReferences();bindControls();setup3D();update();$('loading').hidden=true;
+  try {
+    const photoStatus=await fetch('/api/photos/status',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Photo additions could not be loaded.');return r.json();});
+    const requested=new URLSearchParams(location.search).get('revision');
+    const revisionId=requested || photoStatus.active;
+    if(revisionId) {
+      if(!/^[a-f0-9]{32}$/.test(revisionId))throw new Error('Invalid photo revision.');
+      const revision=await fetch(`/api/revisions/${revisionId}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Photo revision is unavailable.');return r.json();});
+      photoRoot=createPhotoFeatures(revision.data.features);scene.add(photoRoot);update();schedule();
+      $('photo-revision-note').hidden=false;
+      $('photo-revision-label').textContent=`${requested?'Preview':'Applied revision'} · ${revision.data.features.length} photo additions · estimated dimensions · existing house only`;
+    }
+  } catch(error) {toast(error.message);}
 } catch(error) {failure(error)}

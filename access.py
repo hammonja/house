@@ -58,7 +58,7 @@ def protect(app, root):
             if origin and (urlsplit(origin).netloc != request.host
                            or urlsplit(origin).scheme != request.scheme):
                 abort(403)
-        if request.endpoint in {'login', 'setup', 'health', 'static'}:
+        if request.endpoint in {'login', 'setup', 'health', 'static', 'manifest', 'service_worker'}:
             return None
         if not session.get('signed_in'):
             if request.path.startswith(('/api/', '/models/', '/reference/')):

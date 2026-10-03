@@ -3,6 +3,9 @@ from bootstrap import CODE_ROOT, prepare_runtime, restore_seed
 if __name__ == '__main__':
     prepare_runtime()
 
+from runtime_config import load_openai_environment
+load_openai_environment(CODE_ROOT)
+
 from io import BytesIO
 from pathlib import Path
 import math
@@ -20,7 +23,8 @@ def create_app(config=None, project_loader=None):
     app.config.update(DATA_DIR=os.environ.get('HOUSE_DATA_DIR', str(CODE_ROOT / 'private')),
                       SEED_ARCHIVE=os.environ.get('HOUSE_SEED_ARCHIVE', str(CODE_ROOT.parent / 'house-private-seed.zip')),
                       SESSION_COOKIE_SECURE=os.environ.get('HOUSE_LOCAL_HTTP') != '1',
-                      MAX_CONTENT_LENGTH=16 * 1024)
+                      MAX_CONTENT_LENGTH=21 * 1024 * 1024,
+                      PHOTO_WORKER_ENABLED=False)
     if config:
         app.config.update(config)
     root = Path(app.config['DATA_DIR']).resolve()
@@ -64,7 +68,25 @@ def create_app(config=None, project_loader=None):
 
     @app.get('/health')
     def health():
-        return jsonify(status='ok', app='house-design', version='0.3.1')
+        return jsonify(status='ok', app='house-design', version='0.4.0')
+
+    @app.get('/photos')
+    def photo_page():
+        return render_template('photos.html')
+
+    @app.get('/manifest.webmanifest')
+    def manifest():
+        return send_from_directory(CODE_ROOT / 'static', 'manifest.webmanifest', mimetype='application/manifest+json')
+
+    @app.get('/sw.js')
+    def service_worker():
+        response = send_from_directory(CODE_ROOT / 'static', 'sw.js', mimetype='application/javascript')
+        response.headers['Service-Worker-Allowed'] = '/'
+        return response
+
+    @app.errorhandler(413)
+    def too_large(error):
+        return jsonify(error='Each photo must be below 20 MB.'), 413
 
     @app.get('/api/project')
     def project_data():
@@ -101,12 +123,15 @@ def create_app(config=None, project_loader=None):
             abort(404)
         return send_from_directory(root / 'source', name, as_attachment=name.endswith('.dxf'))
 
+    from photos import register_photos
+    register_photos(app, root, get_project)
     return app
 
 
 app = create_app()
 if __name__ == '__main__':
     from waitress import serve
+    app.extensions['photo_worker'].start()
     serve(app, host='127.0.0.1', port=int(os.environ.get('HOUSE_PORT', '5055')),
           threads=4, trusted_proxy='127.0.0.1', trusted_proxy_headers={'x-forwarded-proto'},
           clear_untrusted_proxy_headers=True)
